@@ -1,0 +1,27 @@
+defpackage maybe-utils:
+  import core
+
+public defn expect<?T> (v: Maybe<?T>, msg: Printable|String) -> T:
+  match(v):
+    (v: One<T>): value!(v)
+    (v: None): fatal("%_" % [msg])
+
+public defn map<?T, ?R> (v: Maybe<?T>, f: T -> ?R) -> Maybe<R>:
+  match(v):
+    (v: One<T>): One(f(value!(v)))
+    (v: None): None()
+
+public defn and-then<?T, ?R> (v: Maybe<?T>, f: T -> Maybe<?R>) -> Maybe<R>:
+  match(v):
+    (v: One<T>): f(value!(v))
+    (v: None): None()
+
+public defn value-or<?T, ?D> (v: Maybe<?T>, d: ?D) -> T|D:
+  match(v):
+    (v: One<T>): value!(v)
+    (v: None): d
+
+public defn value-or-fn<?T> (v: Maybe<?T>, f: () -> T) -> T:
+  match(v):
+    (v: One<T>): value!(v)
+    (v: None): f()

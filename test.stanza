@@ -1,0 +1,51 @@
+defpackage maybe-utils/test:
+  import maybe-utils
+  import core
+
+defn test-expect () -> False:
+  if One(1) $> expect{_, "value is there"} != 1:
+    println("Fail!")
+
+  ; Will cause a fatal
+  ;if None() $> expect{_, "value is there"} == 1:
+  ;  println("Bad!")
+
+defn test-map () -> False:
+  if One(1) $> map{_, fn (v): v + 1} != One(2):
+    println("Fail!")
+
+defn test-and-then () -> False:
+  if One(1) $> and-then{_, fn (v): One(v)} != One(1):
+    println("Fail!")
+
+  if One(1) $> and-then{_, fn (v): None()} != None():
+    println("Fail!")
+
+  if None() $> and-then{_, fn (v): One(v)} != None():
+    println("Fail!")
+
+  if None() $> and-then{_, fn (v): None()} != None():
+    println("Fail!")
+
+defn test-value-or () -> False:
+  if One(1) $> value-or{_, 'a'} != 1:
+    println("Fail!")
+
+  if None() $> value-or{_, 'a'} != 'a':
+    println("Fail!")
+
+defn test-value-or-fn () -> False:
+  if One(1) $> value-or-fn{_, {2}} != 1:
+    println("Fail!")
+
+  defn make-typed-none<T> () -> Maybe<T>:
+    None()
+
+  if make-typed-none<Int>() $> value-or-fn{_, {2}} != 2:
+    println("Fail!")
+
+test-expect()
+test-map()
+test-and-then()
+test-value-or()
+test-value-or-fn()
