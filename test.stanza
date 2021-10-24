@@ -2,50 +2,177 @@ defpackage maybe-utils/test:
   import maybe-utils
   import core
 
+defn make-typed-none<T> () -> Maybe<T>:
+  None()
+
+defn assert-eq! (msg: String, actual: Equalable, expected: Equalable) -> False:
+  if actual != expected:
+    println("Fail: %_" % [msg])
+
+defn assert-throws! (msg: String, f: () -> ?) -> False:
+  var threw?: True|False = false
+  try:
+    f()
+  catch (e: Exception):
+    threw? = true
+  if not threw?:
+    println("Fail: %_" % [msg])
+
+defn test-and () -> False:
+  assert-eq!("One(1) & One(2) == One(2)",
+    One(1) $> and?{_, One(2)}, One(2))
+
+  assert-eq!("One(1) & None() == None()",
+    One(1) $> and?{_, None()}, None())
+
+  assert-eq!("None() & One(2) == None()",
+    None() $> and?{_, One(2)}, None())
+
+  assert-eq!("None() & None() == None()",
+    None() $> and?{_, None()}, None())
+
+defn test-and-then () -> False:
+  assert-eq!("One(1) and-then One  == One(1)",
+    One(1) $> and-then{_, One}, One(1))
+
+  assert-eq!("One(1) and-then None == None()",
+    One(1) $> and-then{_, None{}}, None())
+
+  assert-eq!("None() and-then One  == None()",
+    None() $> and-then{_, One}, None())
+
+  assert-eq!("One(1) and-then One  == None()",
+    None() $> and-then{_, None{}}, None())
+
+defn test-contains? () -> False:
+  assert-eq!("One(1) contains? 1 == true" ,
+    One(1) $> contains?{_, 1}, true)
+
+  assert-eq!("One(1) contains? 2 == false",
+    One(1) $> contains?{_, 2}, false)
+
+  assert-eq!("None() contains? 1 == false",
+    None() $> contains?{_, 1}, false)
+
 defn test-expect () -> False:
-  if One(1) $> expect{_, "value is there"} != 1:
-    println("Fail!")
+  assert-eq!("One(1) expect? == 1",
+    One(1) $> expect{_, "value is there"}, 1)
 
   ; Will cause a fatal
   ;if None() $> expect{_, "value is there"} == 1:
   ;  println("Bad!")
 
+defn test-filter () -> False:
+  defn positive? (v: Int) -> True|False: (v > 0)
+
+  assert-eq!("One( 1) filter?(positive?) == One(1)",
+    One( 1) $> filter{_, positive?}, One(1))
+
+  assert-eq!("One(-1) filter?(positive?) == None()",
+    One(-1) $> filter{_, positive?}, None())
+
+  assert-eq!("None()  filter?(positive?) == None()",
+    None()  $> filter{_, positive?}, None())
+
+defn test-flatten () -> False:
+  assert-eq!("One(One(1)) flatten == One(1)",
+    One(One(1)) $> flatten, One(1))
+
+  assert-eq!("One(None()) flatten == None()",
+    One(None()) $> flatten, None())
+
+  assert-eq!("None()      flatten == None()",
+    None()      $> flatten, None())
+
 defn test-map () -> False:
-  if One(1) $> map{_, fn (v): v + 1} != One(2):
-    println("Fail!")
+  assert-eq!("One(1) map(to-string) == One(\"1\")",
+    One(1) $> map{_, to-string}, One("1"))
 
-defn test-and-then () -> False:
-  if One(1) $> and-then{_, fn (v): One(v)} != One(1):
-    println("Fail!")
+  assert-eq!("None() map(to-string) == None()",
+    None() $> map{_, to-string}, None())
 
-  if One(1) $> and-then{_, fn (v): None()} != None():
-    println("Fail!")
+defn test-map-or () -> False:
+  assert-eq!(\<>One(1) map-or("", to-string) == One("1")<>,
+    One(1) $> map-or{_, "", to-string}, "1")
 
-  if None() $> and-then{_, fn (v): One(v)} != None():
-    println("Fail!")
+  assert-eq!(\<>None() map-or("", to-string) == None()<>,
+    None() $> map-or{_, "", to-string}, "")
 
-  if None() $> and-then{_, fn (v): None()} != None():
-    println("Fail!")
+defn test-map-or-else () -> False:
+  assert-eq!(\<>One(1) map-or-else({""}, to-string) == One("1")<>,
+    One(1) $> map-or-else{_, {""}, to-string}, "1")
+
+  assert-eq!(\<>None() map-or-else({""}, to-string) == One("")<>,
+    None() $> map-or-else{_, {""}, to-string}, "")
+
+defn test-or? () -> False:
+  assert-eq!("One(1) | One(2) == One(1)",
+    One(1) $> or?{_, One(2)}, One(1))
+
+  assert-eq!("One(1) | None() == One(1)",
+    One(1) $> or?{_, None()}, One(1))
+
+  assert-eq!("None() | One(2) == One(2)",
+    None() $> or?{_, One(2)}, One(2))
+
+  assert-eq!("None() | None() == None()",
+    None() $> or?{_, None()}, None())
+
+defn test-or-else () -> False:
+  assert-eq!("One(1) or-else {One(2)} == One(1)",
+    One(1) $> or-else{_, {One('2')}}, One(1))
+
+  assert-eq!("None() or-else {One('2')} == One('2')",
+    None() $> or-else{_, {One('2')}}, One('2'))
+
+defn test-or-throw () -> False:
+  assert-eq!("One(1) or-throw(Exception) == One(1)",
+    One(1) $> or-throw{_, Exception("Woah!")}, One(1))
+
+  assert-throws!{"None() or-throw(Exception)", _} $ fn ():
+    None() $> or-throw{_, Exception("Woah!")}
 
 defn test-value-or () -> False:
-  if One(1) $> value-or{_, 'a'} != 1:
-    println("Fail!")
+  assert-eq!("One(1) value-or 'a' == 1",
+    One(1) $> value-or{_, 'a'}, 1)
 
-  if None() $> value-or{_, 'a'} != 'a':
-    println("Fail!")
+  assert-eq!("None() value-or 'a' == 'a'",
+    None() $> value-or{_, 'a'}, 'a')
 
-defn test-value-or-fn () -> False:
-  if One(1) $> value-or-fn{_, {2}} != 1:
-    println("Fail!")
+defn test-value-or-throw () -> False:
+  assert-eq!("One(1) value-or-throw(Exception) == 1",
+    One(1) $> value-or-throw{_, Exception("Woah!")}, 1)
 
-  defn make-typed-none<T> () -> Maybe<T>:
-    None()
+  assert-throws!{"None() value-or-throw(Exception)", _} $ fn ():
+    None() $> value-or-throw{_, Exception("Woah!")}
 
-  if make-typed-none<Int>() $> value-or-fn{_, {2}} != 2:
-    println("Fail!")
+defn test-value-or-else () -> False:
+  assert-eq!("One(1) value-or-else({'2'}) == 1",
+    One(1) $> value-or-else{_, {'2'}}, 1)
 
-test-expect()
-test-map()
+  assert-eq!("None() value-or-else({'2'}) == '2'",
+    make-typed-none<Int>() $> value-or-else{_, {'2'}}, '2')
+
+defn test-to-seq () -> False:
+  assert-eq!("One(1) $> to-seq $> to-tuple == [1]",
+    One(1) $> to-seq $> to-tuple, [1])
+
+  assert-eq!("None() $> to-seq $> to-tuple == []",
+    None() $> to-seq $> to-tuple, [])
+
+test-and()
 test-and-then()
+test-contains?()
+test-expect()
+test-filter()
+test-flatten()
+test-map()
+test-map-or()
+test-map-or-else()
+test-or?()
+test-or-else()
+test-or-throw()
 test-value-or()
-test-value-or-fn()
+test-value-or-else()
+test-value-or-throw()
+test-to-seq()
