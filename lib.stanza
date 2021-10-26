@@ -248,5 +248,5 @@ public defn to-seq<?T> (v: Maybe<?T>) -> Seq<T>:
 
 public defn to-maybe<?T> (v: ?T|False) -> Maybe<T>:
   match(v):
-    (v: T): One(v)
     (v: False): None()
+    (v: T): One(v)
