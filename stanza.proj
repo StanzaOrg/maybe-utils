@@ -1,7 +1,7 @@
 package maybe-utils defined-in "lib.stanza"
 package maybe-utils/test defined-in "test.stanza"
 
-build test:
+build-test test:
     inputs:
         maybe-utils/test
     o: "test"
