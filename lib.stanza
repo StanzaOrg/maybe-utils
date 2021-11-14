@@ -250,3 +250,11 @@ public defn to-maybe<?T> (v: ?T|False) -> Maybe<T>:
   match(v):
     (v: False): None()
     (v: T): One(v)
+
+public defn into?<To, ?From> (v: Maybe<?From>) -> Maybe<To>:
+  match(v: One):
+    match(value!(v)):
+      (v: To): One(v)
+      (_): None()
+  else:
+    None()

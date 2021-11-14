@@ -96,3 +96,6 @@ defstruct Base <: Equalable
 defstruct Derived <: Base
 defmethod equal? (a: Base, b: Base): (true)
 
+deftest into?:
+  defn derived () -> Base: (Derived())
+  #EXPECT(One(derived()) $> into?<Derived> == One(Derived()))
