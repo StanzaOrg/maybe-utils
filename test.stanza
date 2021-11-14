@@ -88,6 +88,22 @@ deftest value-or-else:
   #EXPECT(One(1) $> value-or-else{_, {'2'}} == 1)
   #EXPECT(None<Int>() $> value-or-else{_, {'2'}} == '2')
 
+deftest value-or-return:
+  defn parse (s: String) -> Maybe<[Int, Int, Int]>:
+    label<Maybe<[Int, Int, Int]>> return:
+      val components = to-tuple $ split(s, ".")
+      defn component? (index: Int) -> Int:
+        components[index] $> to-int $> to-maybe $> value-or-return{_, return}
+
+      switch(length(components)):
+        3: One([component?(0), component?(1), component?(2)])
+        else: None()
+
+  #EXPECT(parse("1.2.3") == One([1, 2, 3]))
+  #EXPECT(parse("1.2.foo") == None())
+  #EXPECT(parse("a.2.foo") == None())
+  #EXPECT(parse("foo") == None())
+
 deftest to-seq:
   #EXPECT(One(1) $> to-seq $> to-tuple == [1])
   #EXPECT(None() $> to-seq $> to-tuple == [])
