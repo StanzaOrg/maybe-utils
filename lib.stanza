@@ -5,10 +5,10 @@ doc: \<doc>
 If `v1` contains a value, return `v2`. Otherwise, return `None()`.
 
 ```
-One(1) $> and?{_, One(2)} == One(2)
-One(1) $> and?{_, None()} == None()
-None() $> and?{_, One(2)} == None()
-None() $> and?{_, None()} == None()
+#EXPECT(One(1) $> and?{_, One(2)} == One(2))
+#EXPECT(One(1) $> and?{_, None()} == None())
+#EXPECT(None() $> and?{_, One(2)} == None())
+#EXPECT(None() $> and?{_, None()} == None())
 ```
 <doc>
 public defn and?<?T, ?U> (v1: Maybe<?T>, v2: Maybe<?U>) -> Maybe<U>:
@@ -24,9 +24,9 @@ another `Maybe`, then flatten the result.
 defn positive? (x: Int) -> Maybe<Int>:
   if x > 0: (One(x)) else: (None())
 
-One( 1) $> and-then{_, positive?} == One(1)
-One(-1) $> and-then{_, positive?} == None()
-None()  $> and-then{_, positive?} == None()
+#EXPECT(One( 1) $> and-then{_, positive?} == One(1))
+#EXPECT(One(-1) $> and-then{_, positive?} == None())
+#EXPECT(None()  $> and-then{_, positive?} == None())
 ```
 <doc>
 public defn and-then<?T, ?R> (v: Maybe<?T>, f: T -> Maybe<?R>) -> Maybe<R>:
@@ -38,9 +38,9 @@ doc: \<doc>
 Return `true` if `v` contains the given value `x`.
 
 ```
-One(1) $> contains?{_, 1} == true
-One(1) $> contains?{_, 2} == false
-None() $> contains?{_, 1} == false
+#EXPECT(One(1) $> contains?{_, 1} == true)
+#EXPECT(One(1) $> contains?{_, 2} == false)
+#EXPECT(None() $> contains?{_, 1} == false)
 ```
 <doc>
 public defn contains?<?T> (v: Maybe<?T&Equalable>, x: ?T&Equalable) -> True|False:
@@ -53,8 +53,8 @@ Obtain the inner value of `v`, or `fatal()` with the given `msg` if no value
 exists.
 
 ```
-One(1) $> expect{_, "No value!"} == 1
-None() $> expect{_, "No value!"} ; will crash with `fatal("No value!")`
+#EXPECT(One(1) $> expect{_, "No value!"} == 1)
+; None() $> expect{_, "No value!"} will crash with `fatal("No value!")`
 ```
 <doc>
 public defn expect<?T> (v: Maybe<?T>, msg: Printable|String) -> T:
@@ -69,9 +69,9 @@ otherwise return `v` unchanged.
 
 ```
 defn positive? (v: Int) -> True|False: (v > 0)
-One( 1) $> filter{_, positive?} == One(1)
-One(-1) $> filter{_, positive?} == None()
-None()  $> filter{_, positive?} == None()
+#EXPECT(One( 1) $> filter{_, positive?} == One(1))
+#EXPECT(One(-1) $> filter{_, positive?} == None())
+#EXPECT(None()  $> filter{_, positive?} == None())
 ```
 <doc>
 public defn filter<?T> (v: Maybe<?T>, pred: T -> True|False) -> Maybe<T>:
@@ -87,9 +87,9 @@ doc: \<doc>
 Flatten a nested `Maybe` to remove the outer layer.
 
 ```
-One(One(1)) $> flatten == One(1)
-One(None()) $> flatten == None()
-None()      $> flatten == None()
+#EXPECT(One(One(1)) $> flatten == One(1))
+#EXPECT(One(None()) $> flatten == None())
+#EXPECT(None()      $> flatten == None())
 ```
 <doc>
 public defn flatten<?T> (v: Maybe<Maybe<?T>>) -> Maybe<T>:
@@ -101,8 +101,8 @@ doc: \<doc>
 Apply the given function `f` to the inner value of `v`, if one exists.
 
 ```
-One(1) $> map{_, fn (x): x + 1} == 2
-None() $> map{_, fn (x): x + 1} == None()
+#EXPECT(One(1) $> map{_, fn (x): x + 1} == 2)
+#EXPECT(None() $> map{_, fn (x): x + 1} == None())
 ```
 <doc>
 public defn map<?T, ?R> (v: Maybe<?T>, f: T -> ?R) -> Maybe<R>:
@@ -115,8 +115,8 @@ Apply the given function `f` to the inner value of `v`, if one exists, then
 return the mapped value. Otherwise, return the given default `d`.
 
 ```
-One(1) $> map-or{_, "", to-string} == "1"
-None() $> map-or{_, "", to-string} == ""
+#EXPECT(One(1) $> map-or{_, "", to-string} == "1")
+#EXPECT(None() $> map-or{_, "", to-string} == "")
 ```
 <doc>
 public defn map-or<?T, ?D, ?R> (v: Maybe<?T>, d: ?D, f: T -> ?R) -> R|D:
@@ -129,8 +129,8 @@ Apply the given function `f` to the inner value of `v`, if one exists, then
 return the mapped value. Otherwise, return the given default `d`.
 
 ```
-One(1) $> map-or-else{_, {""}, to-string} == "1"
-None() $> map-or-else{_, {""}, to-string} == ""
+#EXPECT(One(1) $> map-or-else{_, {""}, to-string} == "1")
+#EXPECT(None() $> map-or-else{_, {""}, to-string} == "")
 ```
 <doc>
 public defn map-or-else<?T, ?D, ?R> (v: Maybe<?T>, d: () -> ?D, f: T -> ?R) -> R|D:
@@ -142,10 +142,10 @@ doc: \<doc>
 If `v1` contains a value, return `v1` unchanged, otherwise return `v2`.
 
 ```
-One(1) $> or?{_, One(2)} == One(1)
-One(1) $> or?{_, None()} == One(1)
-None() $> or?{_, One(2)} == One(2)
-None() $> or?{_, None()} == None()
+#EXPECT(One(1) $> or?{_, One(2)} == One(1))
+#EXPECT(One(1) $> or?{_, None()} == One(1))
+#EXPECT(None() $> or?{_, One(2)} == One(2))
+#EXPECT(None() $> or?{_, None()} == None())
 ```
 <doc>
 public defn or?<?T, ?U> (v1: Maybe<?T>, v2: Maybe<?U>) -> Maybe<T|U>:
@@ -158,8 +158,8 @@ If `v` contains a value, return `v` unchanged, otherwise return the computed
 value of the given function `d`.
 
 ```
-One(1) $> or-else{_, {One('2')}} == One(1)
-None() $> or-else{_, {One('2')}} == One('2')
+#EXPECT(One(1) $> or-else{_, {One('2')}} == One(1))
+#EXPECT(None() $> or-else{_, {One('2')}} == One('2'))
 ```
 <doc>
 public defn or-else<?T, ?D> (v: Maybe<?T>, d: () -> Maybe<?D>) -> Maybe<T|D>:
@@ -172,8 +172,8 @@ If `v` contains a value, return `v` unchanged, otherwise throw the given
 exception `e`.
 
 ```
-One(1) $> or-throw{_, Exception("woah!")} == One(1)
-None() $> or-throw{_, Exception("woah!")} ; will throw Exception("woah!")
+#EXPECT(One(1) $> or-throw{_, Exception("woah!")} == One(1))
+; None() $> or-throw{_, Exception("woah!")} will throw Exception("woah!")
 ```
 <doc>
 public defn or-throw<?T> (v: Maybe<?T>, e: Exception) -> Maybe<T>:
@@ -186,8 +186,8 @@ Obtain the inner value of `v`, if one exists, otherwise return the given
 default `d`.
 
 ```
-One(1) $> value-or{_, '2'} == 1
-None() $> value-or{_, '2'} == '2'
+#EXPECT(One(1) $> value-or{_, '2'} == 1)
+#EXPECT(None() $> value-or{_, '2'} == '2')
 ```
 <doc>
 public defn value-or<?T, ?D> (v: Maybe<?T>, d: ?D) -> T|D:
@@ -200,8 +200,8 @@ Obtain the inner value of `v`, if one exists, otherwise compute one using the
 given function `f`.
 
 ```
-One(1) $> value-or-else{_, {'2'}) == 1
-None() $> value-or-else{_, {'2'}) == '2'
+#EXPECT(One(1) $> value-or-else{_, {'2'}) == 1)
+#EXPECT(None() $> value-or-else{_, {'2'}) == '2')
 ```
 <doc>
 public defn value-or-else<?T, ?D> (v: Maybe<?T>, f: () -> ?D) -> T|D:
@@ -214,8 +214,8 @@ Obtain the inner value of `v`, if one exists, otherwise throw the given
 exception `e`.
 
 ```
-One('a') $> value-or-throw{_, Exception("Woah!")} == 'a'
-None()   $> value-or-throw{_, Exception("Woah!")} ; will throw Exception("Woah!")
+#EXPECT(One('a') $> value-or-throw{_, Exception("Woah!")} == 'a')
+; None()   $> value-or-throw{_, Exception("Woah!")} will throw Exception("Woah!")
 ```
 <doc>
 public defn value-or-throw<?T> (v: Maybe<?T>, e: Exception) -> T:
@@ -228,8 +228,8 @@ Obtain a `Seq<T>` that yields one element if the given value `v` has an inner
 value, otherwise a `Seq<T>` that yields no elements.
 
 ```
-One(1) $> to-seq $> to-tuple == [1]
-None() $> to-seq $> to-tuple == []
+#EXPECT(One(1) $> to-seq $> to-tuple == [1])
+#EXPECT(None() $> to-seq $> to-tuple == [])
 ```
 <doc>
 public defn to-seq<?T> (v: Maybe<?T>) -> Seq<T>:
