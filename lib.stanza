@@ -261,12 +261,9 @@ public defn to-seq<?T> (v: Maybe<?T>) -> Seq<T>:
   var inner: Maybe<T> = v
   new Seq<T>:
     defmethod next (this) -> T:
-      val ret = peek(this)
+      val ret = value!(inner)
       inner = None()
       ret
-
-    defmethod peek (this) -> T:
-      value!(inner)
 
     defmethod empty? (this) -> True|False:
       inner is None
