@@ -1,3 +1,4 @@
-version = "0.1.4"
 name = "maybe-utils"
+version = "0.1.5"
+
 [dependencies]

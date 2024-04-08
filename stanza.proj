@@ -1,7 +1,16 @@
-package maybe-utils defined-in "lib.stanza"
-package maybe-utils/test defined-in "test.stanza"
+include? ".slm/stanza.proj"
+pkg-cache: ".slm/pkg-cache"
+
+package maybe-utils defined-in "src/maybe-utils.stanza"
+packages maybe-utils/* defined-in "src/maybe-utils/"
+
+build main :
+  inputs:
+    maybe-utils
+  pkg: ".slm/pkgs"
+  ;o: "main"
 
 build-test test:
-    inputs:
-        maybe-utils/test
-    o: "test"
+  inputs:
+    maybe-utils/test
+  o: "maybe-utils-test"
