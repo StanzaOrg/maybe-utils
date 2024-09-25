@@ -1,3 +1,5 @@
 .slm
 maybe-utils-test
 venv/
+.conan2
+.conan2.cache
